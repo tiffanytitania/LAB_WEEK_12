@@ -3,12 +3,11 @@ package com.example.test_lab_week_12
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.test_lab_week_12.model.Movie
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
+import java.util.Calendar
 
 class MovieViewModel(
     private val movieRepository: MovieRepository
@@ -31,7 +30,15 @@ class MovieViewModel(
                     _error.value = e.message ?: "Unknown error"
                 }
                 .collect { movies ->
-                    _popularMovies.value = movies
+
+                    //filter
+                    val currentYear = Calendar.getInstance().get(Calendar.YEAR).toString()
+
+                    val filteredMovies = movies
+                        .filter { it.releaseDate?.startsWith(currentYear) == true }
+                        .sortedByDescending { it.popularity }
+
+                    _popularMovies.value = filteredMovies
                 }
         }
     }
